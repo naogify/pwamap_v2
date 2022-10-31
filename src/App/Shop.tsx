@@ -80,6 +80,8 @@ const Content = (props: Props) => {
 
             { shop['画像'] && <img src={shop['画像']} alt={shop['スポット名']} style={{width: "100%"}} />}
 
+            <div data-vc_mylinkbox_id="888006023"></div>
+            
             <p style={{margin: "24px 0"}}>{toBreakLine(content)}</p>
 
             <div

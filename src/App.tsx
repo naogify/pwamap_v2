@@ -25,8 +25,6 @@ const sortShopList = async (shopList: Pwamap.ShopData[]) => {
 const App = () => {
   const [shopList, setShopList] = React.useState<Pwamap.ShopData[]>([])
 
-  console.log(config.data_url)
-
   React.useEffect(() => {
     fetch(`${config.data_url}`)
       .then((response) => {
@@ -37,8 +35,6 @@ const App = () => {
         let records = parse(data, {
           columns: true,
         });
-
-        console.log(records)
 
         sortShopList(records).then((sortedRecords) => {
           setShopList(sortedRecords)

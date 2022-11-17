@@ -1,9 +1,6 @@
 {
   "title": "Geolonia PWAマップ",
-  "description": "Google スプレッドシートを更新するだけでオリジナルの地図アプリを作成できる\n「Geolonia PWAマップ」",
-  "form_url": "",
-  "logo_image_url": "https://geoloniamaps.github.io/pwamap/icon-pwamap.svg",
-  "background_image_url": "https://geoloniamaps.github.io/pwamap/geolonia_bgimage_1920_1080.png",
-  "primary_color": "#d2691e",
-  "orderby": "distance"
+  "description": "Google スプレッドシートを更新するだけでオリジナルの地図アプリを作成できる「Geolonia PWAマップ」",
+  "hosting_url": "https://naogify.github.io/pwamap_v2/",
+  "data_url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vS-uV5u8h18b68MsYdsSiEBbVrvkprM4srn_zUhY0drwvS37KbggOQPGn36r3fZEpfNod9qcbMHOrec/pub?gid=1957425126&single=true&output=csv"
 }

@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { parse } from './lib/csv-parse';
+//@ts-ignore
+import { parse } from 'csv-parse/dist/esm/sync';
 import "./App.scss";
 
 import Home from './App/Home'
@@ -10,7 +11,7 @@ import Category from './App/Category'
 import Images from './App/Images'
 
 import Tabbar from './App/Tabbar'
-import zen2han from './lib/zen2han';
+import config from './config.json'
 
 const sortShopList = async (shopList: Pwamap.ShopData[]) => {
 
@@ -24,59 +25,25 @@ const sortShopList = async (shopList: Pwamap.ShopData[]) => {
 const App = () => {
   const [shopList, setShopList] = React.useState<Pwamap.ShopData[]>([])
 
+  console.log(config.data_url)
+
   React.useEffect(() => {
-    fetch(`${process.env.PUBLIC_URL}/data.csv?timestamp=${new Date().getTime()}`)
+    fetch(`${config.data_url}`)
       .then((response) => {
         return response.ok ? response.text() : Promise.reject(response.status);
       })
       .then((data) => {
 
-        // @ts-ignore
-        parse(data, async (error, data) => {
-          if (error) {
-            console.log(error)
-            setShopList([])
-            return
-          }
-
-          const [header, ...records] = data;
-
-          const features = records.map((record: string) => {
-            const properties = header.reduce((prev: any, column: any) => {
-              const value = record[header.indexOf(column)];
-              prev[column] = zen2han(value);
-              return prev;
-            }, {});
-
-            return properties;
-          });
-
-          const nextShopList: Pwamap.ShopData[] = []
-          for (let i = 0; i < features.length; i++) {
-            const feature = features[i] as Pwamap.ShopData
-
-            if (!feature['緯度'] || !feature['経度'] || !feature['スポット名']) {
-              continue;
-            }
-            if (!feature['緯度'].match(/^-?[0-9]+(\.[0-9]+)?$/)) {
-              continue
-            }
-            if (!feature['経度'].match(/^-?[0-9]+(\.[0-9]+)?$/)) {
-              continue
-            }
-
-            const shop = {
-              ...feature,
-              index: i
-            }
-
-            nextShopList.push(shop)
-          }
-
-          sortShopList(nextShopList).then((sortedShopList) => {
-            setShopList(sortedShopList)
-          })
+        let records = parse(data, {
+          columns: true,
         });
+
+        console.log(records)
+
+        sortShopList(records).then((sortedRecords) => {
+          setShopList(sortedRecords)
+        })
+
       });
   }, [])
 

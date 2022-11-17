@@ -1,91 +1,48 @@
-#!/usr/bin/env node
+/**
+ * @file YAML 形式の設定ファイルをパースし 環境変数として react-scripts に読み込ませる
+ */
 
-const fs = require("fs");
-const path = require("path")
-const { parse } = require('csv-parse/sync');
-const csv2geojson = require('csv2geojson');
-const configFilePath = path.join(__dirname, "..", "public/config.csv");
-const dataFilePath = path.join(__dirname, "..", "public/data.csv");
+ const fs = require("fs");
+ const YAML = require("yaml");
+ const path = require("path")
 
-// config.json と .env を作成する
-const exportConfig = () => {
-  try {
-    const file = fs.readFileSync(configFilePath, 'utf8')
-    const data = parse(file);
+ const srcConfigFilePath = path.join(process.cwd(), "/config.yml");
+ const distConfigFilePath = path.join(process.cwd(), "/src/config.json");
 
-    const header = data[0];
-    const body = data[1];
+ let yamlText;
+ try {
+   yamlText = fs.readFileSync(srcConfigFilePath).toString();
+ } catch (error) {
+   process.stderr.write(`${srcConfigFilePath} が存在しません。\n`);
+   process.exit(1);
+ }
 
-    let envText = '';
-    let json = {}
+ let config;
+ try {
+   config = YAML.parse(yamlText);
+ } catch (error) {
+   process.stderr.write(
+     `${srcConfigFilePath} は正しい YAML 形式である必要があります。\n`
+   );
+   process.exit(2);
+ }
 
-    for (let i = 0; i < header.length; i++) {
+ if (!config) {
+   process.stderr.write(
+     `${srcConfigFilePath} は正しい YAML 形式である必要があります。\n`
+   );
+   process.exit(3);
+ }
 
-      if (typeof body[i] === "string" || typeof body[i] === "number") {
+ const envText =
+   Object.keys(config)
+     // オブジェクト等は環境変数として出力しない
+     .filter((key) => typeof config[key] === "string" || typeof config[key] === "number")
+     .map((key) => `REACT_APP_${key.toUpperCase()}="${config[key]}"`)
+     .join("\n") + "\n";
 
-        let value = body[i];
+ // 全ての設定は src/config.json として出力する
+ fs.writeFileSync(distConfigFilePath, JSON.stringify(config, null, 2));
 
-        // .env
-        let upperCaseHeader = header[i].toUpperCase();
-        envText += `REACT_APP_${upperCaseHeader}="${value}"\n`;
-
-        // json
-        json[header[i]] = value;
-      }
-    }
-
-    fs.writeFileSync(path.join(process.cwd(), '.env'), envText)
-    fs.writeFileSync(path.join(__dirname, '..', 'src/config.json'), JSON.stringify(json, null, 2))
-
-  } catch (error) {
-    process.stderr.write(`${configFilePath} が存在しません。\n`);
-    process.exit(1);
-  }
-}
-
-
-const exportGeoJSON = () => {
-  try {
-
-    let file = fs.readFileSync(dataFilePath, 'utf8')
-
-    csv2geojson.csv2geojson(file, {
-      latfield: '緯度',
-      lonfield: '経度',
-      delimiter: ','
-    }, function (err, data) {
-
-
-      // プロパティ名 「スポット名」を「title」に変更
-      if (data && data.features) {
-
-        const features = data.features;
-
-        for (let i = 0; i < features.length; i++) {
-
-          const feature = features[i];
-
-          if (feature.properties && feature.properties['スポット名']) {
-
-            const value = feature.properties['スポット名'];
-            delete feature.properties['スポット名'];
-            feature.properties.title = value;
-
-            data.features[i] = feature;
-
-          }
-        }
-      }
-
-      fs.writeFileSync(path.join(__dirname, '..', 'public/data.geojson'), JSON.stringify(data, null, 2))
-    });
-
-  } catch (error) {
-    process.stderr.write(`${dataFilePath} が存在しません。\n`);
-    process.exit(1);
-  }
-
-}
-
-exportConfig();
-exportGeoJSON();
+ fs.writeFileSync(path.join(process.cwd() , '.env'), envText)
+ process.exit(0);

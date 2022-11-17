@@ -6,6 +6,7 @@ import config from './config.json'
 
 const Content = () => {
 
+  //@ts-ignore
   const logoUrl = config.logo_image_url || `${process.env.PUBLIC_URL}/logo.svg`
 
   return (

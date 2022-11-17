@@ -20,6 +20,15 @@
  let config;
  try {
    config = YAML.parse(yamlText);
+
+   if (!config.background_image_url) {
+    config.background_image_url = ""
+   }
+
+   if (!config.primary_color) {
+    config.primary_color = "#d2691e"
+   }
+
  } catch (error) {
    process.stderr.write(
      `${srcConfigFilePath} は正しい YAML 形式である必要があります。\n`

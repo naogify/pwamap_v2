@@ -8,7 +8,6 @@
 
  const srcConfigFilePath = path.join(process.cwd(), "/config.yml");
  const distConfigFilePath = path.join(process.cwd(), "/src/config.json");
- const distPublicConfigFilePath = path.join(process.cwd(), "/public/config.json");
 
  let yamlText;
  try {
@@ -53,9 +52,6 @@
 
  // 全ての設定は src/config.json として出力する
  fs.writeFileSync(distConfigFilePath, JSON.stringify(config, null, 2));
- // 外部読み込み用の public/config.json として出力する
- fs.writeFileSync(distPublicConfigFilePath, JSON.stringify(config, null, 2));
-
 
  fs.writeFileSync(path.join(process.cwd() , '.env'), envText)
  process.exit(0);

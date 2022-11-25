@@ -4,6 +4,7 @@ import './Shop.scss'
 import { AiOutlineClose } from 'react-icons/ai'
 import { Link } from "react-router-dom";
 import { makeDistanceLabelText } from "./distance-label";
+import Autolinker from 'autolinker';
 
 type Props = {
   shop: Pwamap.ShopData;
@@ -43,20 +44,10 @@ const Content = (props: Props) => {
   const content = shop['紹介文']
 
   const toBreakLine = (text: string) => {
-
-    return text.split(/(\r\n)|(\n)|(\r)/g).map((line, i) => {
-
-      let result: any = '';
-
-      if (line === '\r\n' || line === '\n' || line === '\r') {
-        result = <br key={i} />
-      } else if (line !== undefined) {
-        result = line
-      }
-
-      return result
-    })
+    return text.replace(/\r?\n/g, '<br/>');
   }
+
+  const contentHtml = Autolinker.link(toBreakLine(content))
 
   return (
     <div className="shop-single">
@@ -81,8 +72,13 @@ const Content = (props: Props) => {
             { shop['画像'] && <img src={shop['画像']} alt={shop['スポット名']} style={{width: "100%"}} />}
 
             <div data-vc_mylinkbox_id="888006023"></div>
-            
-            <p style={{margin: "24px 0"}}>{toBreakLine(content)}</p>
+
+            <p
+              style={{margin: "24px 0"}}
+              dangerouslySetInnerHTML={{
+                __html: contentHtml
+              }}
+            />
 
             <div
               ref={mapNode}

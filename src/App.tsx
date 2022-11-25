@@ -12,7 +12,6 @@ import Images from './App/Images'
 
 import Tabbar from './App/Tabbar'
 import config from './config.json'
-import ExportGeoJson from './App/ExportGeoJson'
 
 const sortShopList = async (shopList: Pwamap.ShopData[]) => {
 
@@ -53,7 +52,6 @@ const App = () => {
           <Route path="/category" element={<Category data={shopList} />} />
           <Route path="/images" element={<Images data={shopList} />} />
           <Route path="/about" element={<AboutUs />} />
-          <Route path="/geojson" element={<ExportGeoJson />} />
         </Routes>
       </div>
       <div className="app-footer">

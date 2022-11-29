@@ -3,7 +3,7 @@ import Shop from './Shop'
 import  addMarkers from './addMarkers'
 import setCluster from './setCluster'
 import hideLayers from './hideLayers'
-import { parseHash, updateHash } from '../lib/hash'
+import { parseHash, updateHash, getZXYHash, getCenterZXY } from '../lib/hash'
 import toGeoJson from './toGeoJson'
 // @ts-ignore
 import geojsonExtent from '@mapbox/geojson-extent'
@@ -73,16 +73,10 @@ const Content = (props: Props) => {
     setCluster(mapObject)
 
     // もしハッシュがあれば、そこに移動する
-    const hash = parseHash();
-    if (hash && hash.get('map')) {
+    const zxyHash = getZXYHash();
+    if (zxyHash) {
 
-      const latLngString = hash.get('map') || '';
-      const zlatlng = latLngString.split('/');
-
-      const zoom = zlatlng[0]
-      const lat = zlatlng[1]
-      const lng = zlatlng[2]
-
+      const { zoom, lat, lng } = zxyHash
       mapObject.flyTo({ center: [lng, lat], zoom, speed: 3 });
 
     } else {
@@ -93,17 +87,7 @@ const Content = (props: Props) => {
 
     // 地図の移動が終わったらハッシュを更新
     mapObject.on('moveend', () => {
-      // see: https://github.com/maplibre/maplibre-gl-js/blob/ba7bfbc846910c5ae848aaeebe4bde6833fc9cdc/src/ui/hash.js#L59
-      const center = mapObject.getCenter(),
-        rawZoom = mapObject.getZoom(),
-        zoom = Math.round(rawZoom * 100) / 100,
-        // derived from equation: 512px * 2^z / 360 / 10^d < 0.5px
-        precision = Math.ceil((zoom * Math.LN2 + Math.log(512 / 360 / 0.5)) / Math.LN10),
-        m = Math.pow(10, precision),
-        lng = Math.round(center.lng * m) / m,
-        lat = Math.round(center.lat * m) / m,
-        zStr = Math.ceil(zoom);
-
+      const { zStr, lng, lat } = getCenterZXY(mapObject)
       setZLatLngString(`${zStr}/${lat}/${lng}`);
     });
 

@@ -1,4 +1,13 @@
 const setCluster = (map: any) => {
+
+  if (
+    !map.getSource('shops') &&
+    map.getLayer('clusters') &&
+    map.getLayer('cluster-count')
+  ) {
+    return;
+  }
+
   map.addLayer({
     id: 'clusters',
     type: 'circle',

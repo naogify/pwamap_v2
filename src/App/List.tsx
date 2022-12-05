@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ShopListItem from './ShopListItem'
 import Shop from './Shop'
 import './List.scss'
@@ -49,8 +49,9 @@ const Content = (props: Props) => {
   const [page, setPage] = React.useState(10);
   const [hasMore, setHasMore] = React.useState(true);
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const queryCategory = searchParams.get('category')
+  const queryId = searchParams.get('id')
 
   React.useEffect(() => {
 
@@ -94,6 +95,7 @@ const Content = (props: Props) => {
   const popupHandler = (shop: Pwamap.ShopData) => {
     if (shop) {
       setShop(shop)
+      setSearchParams({'id': shop['id']})
     }
   }
 
@@ -125,6 +127,19 @@ const Content = (props: Props) => {
       top: '100px'
     }}
   >場所一覧を読み込み中です...</div>;
+
+
+  useEffect(() => {
+
+    if (queryId && list) {
+      const shop = list.find((shop) => {
+        return shop['id'] === queryId
+      })
+      if (shop) {
+        setShop(shop)
+      }
+    }
+  }, [list, queryId])
 
   return (
     <div id="shop-list" className="shop-list">

@@ -3,6 +3,7 @@ declare namespace Pwamap {
     index: number;
     distance?: number;
     'タイムスタンプ': string;
+    'id': string;
     '緯度': string;
     '経度': string;
     'スポット名': string;

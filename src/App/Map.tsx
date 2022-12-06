@@ -6,6 +6,8 @@ import hideLayers from './hideLayers'
 import toGeoJson from './toGeoJson'
 // @ts-ignore
 import geojsonExtent from '@mapbox/geojson-extent'
+import { useSearchParams, useNavigate } from "react-router-dom";
+import Loading from './Loading'
 
 type Props = {
   data: Pwamap.ShopData[];
@@ -21,6 +23,9 @@ const Content = (props: Props) => {
   const mapNode = useRef<HTMLDivElement>(null);
   const [mapObject, setMapObject] = useState<any>()
   const [shop, setShop] = useState<Pwamap.ShopData | undefined>(undefined)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryId = searchParams.get('id');
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Only once reder the map.
@@ -65,22 +70,33 @@ const Content = (props: Props) => {
       return
     }
 
+    if (queryId) {
+      const shop = props.data.find((shop) => {
+        return shop['id'] === queryId
+      })
+      if (shop) {
+        setShop(shop)
+      }
+    }
+
     const geojson = toGeoJson(props.data)
 
-    addMarkers(mapObject, geojson, setShop)
+    addMarkers(mapObject, geojson, setShop, setSearchParams)
     setCluster(mapObject)
 
     const bounds = geojsonExtent(geojson)
     mapObject.fitBounds(bounds, { padding: 50 })
 
-  }, [mapObject, props.data])
+  }, [mapObject, props.data, queryId, setSearchParams])
 
   const closeHandler = () => {
     setShop(undefined)
+    navigate("/");
   }
 
   return (
     <div style={CSS}>
+      {queryId && <Loading/>}
       <div
         ref={mapNode}
         style={CSS}

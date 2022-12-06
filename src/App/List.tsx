@@ -2,9 +2,10 @@ import React, { useEffect } from "react";
 import ShopListItem from './ShopListItem'
 import Shop from './Shop'
 import './List.scss'
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { askGeolocationPermission } from '../geolocation'
+import Loading from './Loading'
 import * as turf from "@turf/turf"
 
 type Props = {
@@ -48,6 +49,7 @@ const Content = (props: Props) => {
   const [list, setList] = React.useState<any[]>([]);
   const [page, setPage] = React.useState(10);
   const [hasMore, setHasMore] = React.useState(true);
+  const navigate = useNavigate();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const queryCategory = searchParams.get('category')
@@ -101,6 +103,7 @@ const Content = (props: Props) => {
 
   const closeHandler = () => {
     setShop(undefined)
+    navigate("/list");
   }
 
     //項目を読み込むときのコールバック
@@ -115,19 +118,6 @@ const Content = (props: Props) => {
       setList([...list, ...data.slice(page, page + 10)])
       setPage(page + 10)
     }
-
-  const loader = <div
-    className="loader"
-    key={0}
-    style={{
-      width: '100%',
-      height: '200px',
-      textAlign: 'center',
-      position: 'relative',
-      top: '100px'
-    }}
-  >場所一覧を読み込み中です...</div>;
-
 
   useEffect(() => {
 
@@ -149,8 +139,9 @@ const Content = (props: Props) => {
         dataLength={list.length}
         next={loadMore}
         hasMore={hasMore}
-        loader={loader}
+        loader={<Loading />}
         scrollableTarget="shop-list"
+        style={{width: '100%', height: '100%'}}
       >
         {
           list.map((item, index) => {

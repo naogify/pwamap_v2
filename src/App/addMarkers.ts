@@ -1,7 +1,7 @@
 const textColor = '#000000'
 const textHaloColor = '#FFFFFF'
 
-const addMarkers = (mapObject: any, geojson: any, setShop: any) => {
+const addMarkers = (mapObject: any, geojson: any, setShop: any, setSearchParams: any) => {
 
   // nothing to do if shops exists.
   if (mapObject.getSource('shops')) {
@@ -83,13 +83,17 @@ const addMarkers = (mapObject: any, geojson: any, setShop: any) => {
 
   mapObject.on('click', 'shop-points', (event: any) => {
     if (!event.features[0].properties.cluster) {
+
+      console.log(event.features[0].properties)
       setShop(event.features[0].properties)
+      setSearchParams({'id': event.features[0].properties.id})
     }
   })
 
   mapObject.on('click', 'shop-symbol', (event: any) => {
     if (!event.features[0].properties.cluster) {
       setShop(event.features[0].properties)
+      setSearchParams({'id': event.features[0].properties.id})
     }
   })
 

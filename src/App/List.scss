@@ -29,3 +29,10 @@
     display: flex;
   }
 }
+
+.infinite-scroll-component__outerdiv {
+  height: 100%;
+  .infinite-scroll-component {
+    height: 100%;
+  }
+}
